@@ -147,7 +147,7 @@
        (str/split-lines)
        (filter (comp (fn [i] (> i 0)) count str/trim))
        ((fn [lines]
-          (log/info (<< "received ~(count lines) message lines"))
+          (log/trace (<< "received ~(count lines) message lines"))
           lines))
        (map json/read-json)
        (messages-by-type)))
@@ -176,7 +176,7 @@
   (if (and (realized? (:status response))
            (= (:code @(:status response)) 200))
     (do
-      (log/info (<< "received chunk of length ~(count body)"))
+      (log/trace (<< "received chunk of length ~(count body)"))
       (process-chunk twitter-stream body))
     (do
       (log/warn "ignoring body from incomplete or failed request")
@@ -211,7 +211,7 @@
         next-connection-time (.plus now (long next-backoff-ms))
         next-failure-count (inc (or (:failure-count twitter-stream) 0))]
     (log/warn (<< "protocol failure. failure-count ~{next-failure-count}. backing off ~{next-backoff-ms}ms until ~(.toString next-connection-time)"))
-    (log/warn (print-response-str response))
+    (log/debug (print-response-str response))
     (send-off twitter-stream-agent start-twitter-stream-action (:request-fn (meta twitter-stream-agent)) :force? false)
     (assoc twitter-stream
       :response nil
@@ -240,8 +240,8 @@
     (if (= state :runnable)
       (do
         (log/warn (<< "network failure. failure-count ~{next-failure-count}. backing off ~{next-backoff-ms}ms until ~(.toString next-connection-time)"))
-        (log/warn (print-response-str response))
-        (log/warn throwable "twitter streaming failure")
+        (log/debug throwable "twitter streaming failure")
+        (log/debug (print-response-str response))
         (send-off twitter-stream-agent start-twitter-stream-action (:request-fn (meta twitter-stream-agent)) :force? false)
         (assoc twitter-stream
           :response nil
@@ -249,7 +249,7 @@
           :last-backoff-ms next-backoff-ms
           :next-connection-time next-connection-time))
       (do
-        (log/debug "exception ignored : stream cancelled")
+        (log/debug "exception ignored : stream already cancelled")
         twitter-stream))))
 
 (defn create-record-exception-on-exception-handler
@@ -275,7 +275,7 @@
           response (:response @state)
           new-state (assoc state :response nil)]
       (log/warn "error on twitter-stream-agent. clearing actions and restarting")
-      (log/warn throwable "error on twitter-stream-agent")
+      (log/debug throwable "error on twitter-stream-agent")
       (if response (cancel-http-async-client-response response))
       (restart-agent twitter-stream-agent new-state :clear-actions true)
       (send-off twitter-stream-agent start-twitter-stream-action (:request-fn (meta twitter-stream-agent)) :force? false))))
