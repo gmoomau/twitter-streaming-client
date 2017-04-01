@@ -3,7 +3,8 @@
    for Twitter Streaming API calls, and adding support for recovery and retry and batch
    processing of results"
   (:use clojure.core.strint
-        clojure.tools.macro)
+        clojure.tools.macro
+        overtone.at-at)
   (:require
    [clojure.string :as str]
    [clojure.set :as set]
@@ -19,6 +20,10 @@
    (twitter.callbacks.protocols AsyncStreamingCallback)
    (org.joda.time Instant Duration)
    (clojure.lang IPending)))
+
+; resources for stream timeout detection
+(def reconnect-pool (mk-pool))
+(def reconnect-job (atom 0))
 
 (defmacro with-warnings
   "evaluates forms. catches, logs and rethrows any
@@ -182,10 +187,15 @@
       (log/warn "ignoring body from incomplete or failed request")
       twitter-stream)))
 
+(declare reconnect-twitter-stream-action)
+
 (defn create-enqueue-on-bodypart-handler
   "twitter-api on-bodypart handler : sends enqueue-bodypart-action"
   [twitter-stream-agent]
   (fn [response baos]
+    (do
+      (kill @reconnect-job)
+      (reset! reconnect-job (after 240000 #(reconnect-twitter-stream-action twitter-stream-agent) reconnect-pool)))
     (let [body (.toString baos "UTF-8")]
       (send-off twitter-stream-agent enqueue-bodypart-action response body))))
 
@@ -330,3 +340,10 @@
       (do
         (log/info "cancelled: use start-twitter-stream to restart")
         twitter-stream))))
+
+(defaction reconnect-twitter-stream-action [twitter-stream-agent]
+  "restart the stream because it failed silently"
+  (do
+    (log/warn (<< "stream died silently. reconnecting"))
+    (send-off twitter-stream-agent cancel-twitter-stream-action)
+    (send-off twitter-stream-agent start-twitter-stream-action (:request-fn (meta twitter-stream-agent)) :force? true)))
