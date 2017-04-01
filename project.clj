@@ -7,7 +7,7 @@
 
     [overtone/at-at "1.2.0"]
 
-    [twitter-api "0.7.8"]])
+    [twitter-api "1.8.0"]])
 
 (defproject twitter-streaming-client/twitter-streaming-client "0.3.3"
   :description "a clojure based client for Twitter's streaming API"
