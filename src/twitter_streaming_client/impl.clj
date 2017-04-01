@@ -211,7 +211,7 @@
 (defaction record-failure-action
   "record an http failure.
    - doubles the backoff time, maxing at 240s
-     as per https://dev.twitter.com/docs/streaming-api/concepts#connecting
+     as per https://dev.twitter.com/streaming/overview/connecting
    - logs the failed response, and clears the response field
    - kicks off a re-start of the client"
   [twitter-stream twitter-stream-agent response]
@@ -238,7 +238,7 @@
 (defaction record-exception-action
   "record some non-http failure.
    - increases the backoff time in increments of 250ms, capped at 16s
-     as per https://dev.twitter.com/docs/streaming-api/concepts#connecting
+     as per https://dev.twitter.com/streaming/overview/connecting
    - kicks off a re-start of the client"
   [twitter-stream twitter-stream-agent response throwable]
   (let [state (:state twitter-stream)
