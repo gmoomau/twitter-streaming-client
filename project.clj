@@ -9,9 +9,9 @@
 
     [twitter-api "1.8.0"]])
 
-(defproject twitter-streaming-client/twitter-streaming-client "0.3.3"
+(defproject twitter-streaming-client/twitter-streaming-client "0.3.4"
   :description "a clojure based client for Twitter's streaming API"
-  :url "https://github.com/mccraigmccraig/twitter-streaming-client"
+  :url "https://github.com/gmoomau/twitter-streaming-client"
 
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
