@@ -9,7 +9,7 @@
 
     [twitter-api "1.8.0"]])
 
-(defproject twitter-streaming-client/twitter-streaming-client "0.3.4"
+(defproject twitter-streaming-client/twitter-streaming-client "0.3.4-SNAPSHOT"
   :description "a clojure based client for Twitter's streaming API"
   :url "https://github.com/gmoomau/twitter-streaming-client"
 
@@ -19,10 +19,10 @@
   :min-lein-version "2.0.0"
   :plugins [[lein-midje "3.1.3"]]
 
-  :dependencies ~(conj shared '[org.clojure/clojure "1.6.0"])
+  :dependencies ~(conj shared '[org.clojure/clojure "1.8.0"])
   :dev-dependencies []
 
-  :aliases {"all" ["with-profile" "dev,1.4:dev,1.5:dev,1.6:dev,1.7"]}
+  :aliases {"all" ["with-profile" "dev,1.4:dev,1.5:dev,1.6:dev,1.7:dev,1.8"]}
 
   :profiles {:all {:dependencies ~shared}
 
@@ -38,5 +38,6 @@
              :1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}
              :1.5 {:dependencies [[org.clojure/clojure "1.5.1"]]}
              :1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}
-             :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}})
+             :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
+             :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}})
 
